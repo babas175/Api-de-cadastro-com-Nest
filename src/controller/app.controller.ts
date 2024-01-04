@@ -1,13 +1,17 @@
 /* eslint-disable prettier/prettier */
 // app.controller.ts
 
-import { Controller, Get, Post, Body, NotFoundException, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, NotFoundException, Param, Put, Delete,  UseGuards, Request } from '@nestjs/common';
 import { AppService } from '../services/app.service';
+import { AuthService } from '../services/auth.service';
 import { Usuario } from 'src/interface/usuario.interface';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly authService: AuthService
+    ) {}
 
   @Post('/cadastro')
   async cadastrar(@Body() requestBody: { nome: string; email: string; senha: string; id: number }): Promise<{ message: string }> {
@@ -61,6 +65,22 @@ export class AppController {
       }
       throw error;
     }
+  }
+
+  @Post('/login')
+  async login(@Body() requestBody: { email: string; senha: string }) {
+    const { email, senha } = requestBody;
+    const user = await this.authService.validateUser(email, senha);
+    if (!user) {
+      return { message: 'Credenciais inválidas', error: 'Unauthorized', statusCode: 401 };
+    }
+    return this.authService.login(user);
+  }
+
+  @Get('/rota-protegida')
+  @UseGuards(AuthGuard('jwt'))
+  rotaProtegida(@new Request() req) {
+    return { message: 'Rota protegida', user: req.user };
   }
   
 }
