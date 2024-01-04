@@ -1,0 +1,52 @@
+# API Nest.js
+
+Esta API Nest.js foi desenvolvida para gerenciar usuários em um banco de dados PostgreSQL.
+
+## Requisitos
+
+- Node.js (v14 ou superior)
+- Nest.js (v8 ou superior)
+- PostgreSQL
+
+## Instalação
+
+1. **Clonar o repositório:**
+
+    ```bash
+    git clone https://github.com/seu-usuario/seu-repositorio.git
+    ```
+
+2. **Instalar Dependências:**
+
+    ```bash
+    cd seu-repositorio
+    npm install
+    ```
+
+3. **Configuração do Banco de Dados:**
+
+   - Crie um banco de dados PostgreSQL.
+   - Configure as informações do banco de dados em `src/config/database.config.ts`.
+
+4. **Executar a Aplicação:**
+
+    ```bash
+    npm run start
+    ```
+
+   A aplicação estará acessível em `http://localhost:3000` por padrão.
+
+## Endpoints
+
+### 1. Cadastrar Usuário
+
+- **Endpoint:** POST `/cadastro`
+- **Payload de Exemplo:**
+
+  ```json
+  {
+      "nome": "Nome do Usuário",
+      "email": "usuario@email.com",
+      "senha": "senha123",
+      "id": 1
+  }
