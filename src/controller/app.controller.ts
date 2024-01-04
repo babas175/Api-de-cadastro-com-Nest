@@ -5,6 +5,8 @@ import { Controller, Get, Post, Body, NotFoundException, Param, Put, Delete,  Us
 import { AppService } from '../services/app.service';
 import { AuthService } from '../services/auth.service';
 import { Usuario } from 'src/interface/usuario.interface';
+import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller()
 export class AppController {
@@ -79,8 +81,9 @@ export class AppController {
 
   @Get('/rota-protegida')
   @UseGuards(AuthGuard('jwt'))
-  rotaProtegida(@new Request() req) {
-    return { message: 'Rota protegida', user: req.user };
+    rotaProtegida(@Request() req) {
+      return { message: 'Rota protegida', user: req.user };
   }
+
   
 }

@@ -6,6 +6,8 @@ import { AppController } from './controller/app.controller';
 import { AppService } from './services/app.service';
 import { UsuarioRepository } from './repository/usuario.repository';
 import { Usuario } from './interface/usuario.interface';
+import { AuthService } from './services/auth.service';
+import { JwtModule } from './services/jwt.module';
 
 @Module({
   imports: [
@@ -20,8 +22,9 @@ import { Usuario } from './interface/usuario.interface';
       synchronize: true,
     }),
     TypeOrmModule.forFeature([Usuario]), 
+    JwtModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UsuarioRepository],
+  providers: [AppService, UsuarioRepository, AuthService],
 })
 export class AppModule {}
