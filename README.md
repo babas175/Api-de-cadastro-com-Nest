@@ -64,7 +64,7 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [SEBASTIEN LIONEL LUBIN](https://kamilmysliwiec.com)
+- Author - [SEBASTIEN LIONEL LUBIN](https://www.linkedin.com/in/sebastien-lionel-lubin-a3691b1a2/)
 - Website - [https://nestjs.com](https://nestjs.com/)
 - Twitter - [@nestframework](https://twitter.com/nestframework)
 
