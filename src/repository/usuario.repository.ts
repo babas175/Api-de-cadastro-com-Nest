@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 // database.connection.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../interface/usuario.interface';
@@ -9,6 +9,7 @@ import { Usuario } from '../interface/usuario.interface';
 
 @Injectable()
 export class UsuarioRepository {
+  findOne: any;
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
@@ -40,5 +41,21 @@ export class UsuarioRepository {
   async deletarUsuarioPorEmail(email: string): Promise<void> {
     await this.usuarioRepository.delete({ email });
   }
+
+  // auth.service.ts
+  async login(email: string, senha: string): Promise<Usuario | null> {
+    try {
+  
+      const usuario = await this.usuarioRepository.findOne({ where: { email } });
+      const usuario1 = await this.usuarioRepository.findOne({ where: { senha } });
+      return usuario  || usuario1;
+
+    } catch (error) {
+      console.error('Error during login:', error);
+      throw new UnauthorizedException('Erro durante o login', error.message);
+    }
+  }
+  
+
 
 }

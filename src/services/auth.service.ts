@@ -1,22 +1,32 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prettier/prettier */
-// auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UsuarioRepository } from '../repository/usuario.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtService,
+    private readonly usuarioRepository: UsuarioRepository
+    ) {}
 
-  async validateUser(email: string, senha: string): Promise<any> {
-    const user = { email: 'usuario@email.com', senha: 'senha123' };
-    if (user && user.senha === senha) {
-      const { senha, ...result } = user;
-      return result;
+    async validateUser(email: string, senha: string): Promise<any> {
+      try {
+        const user = await this.usuarioRepository.login(email, senha);
+        if (user) {
+          const passwordMatch = await bcrypt.compare(senha, user.senha);
+      
+          if (passwordMatch) {
+            return user;
+          }
+        }
+        throw new UnauthorizedException('Credenciais inválidas');
+      } catch (error) {
+        throw new UnauthorizedException('Erro durante a autenticação', error.message);
+      }
     }
-    return null;
-  }
+  
 
   async login(user: any) {
     const payload = { email: user.email, sub: user.id };
