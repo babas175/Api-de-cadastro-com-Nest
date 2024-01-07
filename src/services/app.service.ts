@@ -57,6 +57,9 @@ export class AppService {
   
     await this.usuarioRepository.deletarUsuarioPorEmail(email);
   }
+  async buscarPorFiltroNome(filtro: string): Promise<Usuario[]> {
+    return this.usuarioRepository.buscarPorFiltroNome(filtro);
+  }
   
 }
 

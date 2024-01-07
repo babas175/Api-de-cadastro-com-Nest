@@ -3,7 +3,7 @@
 
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Usuario } from '../interface/usuario.interface';
 
 
@@ -54,6 +54,14 @@ export class UsuarioRepository {
       console.error('Error during login:', error);
       throw new UnauthorizedException('Erro durante o login', error.message);
     }
+  }
+
+  buscarPorFiltroNome(filtro: string): Promise<Usuario[]> {
+    return this.usuarioRepository.find({
+      where: {
+        nome: Like(`%${filtro}%`),
+      },
+    });
   }
   
 

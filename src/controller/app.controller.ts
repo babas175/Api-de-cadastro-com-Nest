@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 // app.controller.ts
 
-import { Controller, Get, Post, Body, NotFoundException, Param, Put, Delete,  UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, NotFoundException, Param, Put, Delete,  UseGuards, Request, BadRequestException, InternalServerErrorException, Query } from '@nestjs/common';
 import { AppService } from '../services/app.service';
 import { AuthService } from '../services/auth.service';
 import { Usuario } from 'src/interface/usuario.interface';
@@ -84,6 +84,33 @@ export class AppController {
     rotaProtegida(@Request() req) {
       return { message: 'Rota protegida', user: req.user };
   }
+  
+
+  @Get('/BuscarPorFiltroNome')
+  async buscarPorFiltroNome(@Query('filtro') filtro: string): Promise<Usuario[]> {
+    try {
+      // Verifique se o filtro foi fornecido
+      if (!filtro || typeof filtro !== 'string') {
+        throw new BadRequestException('Filtro inválido');
+      }
+
+      // Realize a busca no banco de dados (exemplo usando o TypeORM)
+      const usuarios = await this.appService.buscarPorFiltroNome(filtro);
+
+      // Ordene os resultados por nome
+      const usuariosOrdenados = usuarios.sort((a, b) => a.nome.localeCompare(b.nome));
+
+      return usuariosOrdenados;
+    } catch (error) {
+      // Você pode personalizar a resposta de acordo com o tipo de erro
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw new InternalServerErrorException('Erro interno');
+      }
+    }
+  }
+
 
   
 }
