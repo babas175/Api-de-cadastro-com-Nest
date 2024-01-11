@@ -42,7 +42,6 @@ export class UsuarioRepository {
     await this.usuarioRepository.delete({ email });
   }
 
-  // auth.service.ts
   async login(email: string, senha: string): Promise<Usuario | null> {
     try {
   
