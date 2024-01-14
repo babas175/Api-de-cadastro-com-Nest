@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 // database.connection.ts
 
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { Usuario } from '../interface/usuario.interface';
@@ -20,30 +20,70 @@ export class UsuarioRepository {
   }
 
   async listarUsuarios(): Promise<Usuario[]> {
-    return await this.usuarioRepository.find();
+    try {
+      const usuarios = await this.usuarioRepository.find();
+      return usuarios;
+    } catch (error) {
+      throw new NotFoundException('Erro ao listar usuários');
+    }
   }
+  
 
   async buscarUsuarioPorEmail(email: string): Promise<Usuario | null> {
-    const usuario = await this.usuarioRepository.findOne({ where: { email } });
-    return usuario || null;
+    try {
+      if (!email) {
+        throw new NotFoundException('Email não fornecido!');
+      }
+      const usuario = await this.usuarioRepository.findOne({ where: { email } });
+      if (!usuario) {
+        throw new NotFoundException('Usuário não encontrado');
+      }
+      return usuario;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new NotFoundException('Erro ao buscar usuário por email');
+      }
+    }
   }
+  
 
   async atualizarUsuario(email: string, usuarioData: Partial<Usuario>): Promise<Usuario | null> {
-    const usuarioExistente = await this.usuarioRepository.findOne({ where: { email } });
-    if (!usuarioExistente) {
-      return null; 
+    try {
+      const usuarioExistente = await this.usuarioRepository.findOne({ where: { email } });
+      if (!usuarioExistente) {
+        throw new NotFoundException('Usuário não encontrado');
+      }
+      await this.usuarioRepository.update({ email }, usuarioData);
+      const usuarioAtualizado = await this.usuarioRepository.findOne({ where: { email } });
+      return usuarioAtualizado || null;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; 
+      } else {
+        throw new InternalServerErrorException('Erro ao atualizar usuário');
+      }
     }
-    await this.usuarioRepository.update({ email }, usuarioData);
-    const usuarioAtualizado = await this.usuarioRepository.findOne({ where: { email } });
-    return usuarioAtualizado || null;
   }
+  
 
-  async deletarUsuarioPorEmail(email: string): Promise<void> {
-    if (!email){
-       throw new NotFoundException('Email inexistente !');
+  async deletarUsuarioPorEmail(email: string): Promise<string> {
+    try {
+      if (!email) {
+        throw new NotFoundException('Email inexistente!');
+      }
+      await this.usuarioRepository.delete({ email });
+      return 'Usuário deletado com sucesso!';
+      } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new NotFoundException('Erro ao deletar usuário por email');
+      }
     }
-    await this.usuarioRepository.delete({ email });
   }
+  
 
   async login(email: string, senha: string): Promise<Usuario | null> {
     try {

@@ -8,20 +8,25 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly usuarioRepository: UsuarioRepository) {}
+  constructor(
+    private readonly usuarioRepository: UsuarioRepository
+    ) {}
 
   async cadastrarUsuario(nome: string, email: string, senha: string, id: number): Promise<void> {
     if (!nome || !email || !senha) {
       throw new BadRequestException('Nome, e-mail e senha são obrigatórios');
     }
-  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       throw new BadRequestException('E-mail inválido');
     }
     const senhaCriptografada = await bcrypt.hash(senha, 10);
-  
-    const usuario: Usuario = { nome, email, senha: senhaCriptografada, id };
+    const usuario: Usuario = { 
+                          nome, 
+                          email, 
+                          senha: senhaCriptografada, 
+                          id 
+                            };
     await this.usuarioRepository.cadastrarUsuario(usuario);
   }
   
@@ -54,9 +59,9 @@ export class AppService {
     if (!usuarioExistente) {
       throw new NotFoundException('Usuário não encontrado');
     }
-  
     await this.usuarioRepository.deletarUsuarioPorEmail(email);
   }
+
   async buscarPorFiltroNome(filtro: string): Promise<Usuario[]> {
     return this.usuarioRepository.buscarPorFiltroNome(filtro);
   }
