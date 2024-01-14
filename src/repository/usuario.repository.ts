@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 // database.connection.ts
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { Usuario } from '../interface/usuario.interface';
@@ -39,12 +39,14 @@ export class UsuarioRepository {
   }
 
   async deletarUsuarioPorEmail(email: string): Promise<void> {
+    if (!email){
+       throw new NotFoundException('Email inexistente !');
+    }
     await this.usuarioRepository.delete({ email });
   }
 
   async login(email: string, senha: string): Promise<Usuario | null> {
     try {
-  
       const usuario = await this.usuarioRepository.findOne({ where: { email } });
       const usuario1 = await this.usuarioRepository.findOne({ where: { senha } });
       return usuario  || usuario1;
